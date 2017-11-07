@@ -201,7 +201,7 @@ JSQMessagesKeyboardControllerDelegate>
     self.showLoadEarlierMessagesHeader = NO;
 
     self.topContentAdditionalInset = 0.0f;
-
+    
     [self jsq_updateCollectionViewInsets];
 
     // Don't set keyboardController if client creates custom content view via -loadToolbarContentView
@@ -300,6 +300,12 @@ JSQMessagesKeyboardControllerDelegate>
 
     if ([UIDevice jsq_isCurrentDeviceBeforeiOS8]) {
         [self.snapshotView removeFromSuperview];
+    }
+    
+    if (@available(iOS 11.0, *)) {
+        if (!self.inputToolbar.contentView.textView.isFirstResponder) {
+            self.toolbarBottomLayoutGuide.constant = self.view.safeAreaInsets.bottom;
+        }
     }
 }
 
@@ -908,9 +914,13 @@ JSQMessagesKeyboardControllerDelegate>
         return;
     }
 
-    CGFloat heightFromBottom = CGRectGetMaxY(self.collectionView.frame) - CGRectGetMinY(keyboardFrame);
+    CGFloat heightFromBottom = CGRectGetMaxY(self.view.frame) - CGRectGetMinY(keyboardFrame);
 
     heightFromBottom = MAX(0.0, heightFromBottom);
+    
+    if (@available(iOS 11, *)) {
+        heightFromBottom = MAX(self.view.safeAreaInsets.bottom, heightFromBottom);
+    }
 
     [self jsq_setToolbarBottomLayoutGuideConstant:heightFromBottom];
 }
@@ -1054,8 +1064,27 @@ JSQMessagesKeyboardControllerDelegate>
 
 - (void)jsq_updateCollectionViewInsets
 {
-    [self jsq_setCollectionViewInsetsTopValue:self.topLayoutGuide.length + self.topContentAdditionalInset
-                                  bottomValue:CGRectGetMaxY(self.collectionView.frame) - CGRectGetMinY(self.inputToolbar.frame)];
+    CGFloat top;
+    CGFloat bottom;
+    
+    if (@available(iOS 11, *)) {
+        top = self.topContentAdditionalInset;
+        switch (self.collectionView.contentInsetAdjustmentBehavior) {
+            case UIScrollViewContentInsetAdjustmentNever:
+                top += self.view.safeAreaInsets.top;
+                break;
+            default:
+                break;
+        }
+        bottom = 0;
+    }
+    else {
+        top = self.topLayoutGuide.length + self.topContentAdditionalInset;
+        bottom = 0;
+    }
+    
+    [self jsq_setCollectionViewInsetsTopValue:top
+                                  bottomValue:bottom];
 }
 
 - (void)jsq_setCollectionViewInsetsTopValue:(CGFloat)top bottomValue:(CGFloat)bottom
