@@ -908,13 +908,9 @@ JSQMessagesKeyboardControllerDelegate>
         return;
     }
 
-    CGFloat heightFromBottom = CGRectGetMaxY(self.view.frame) - CGRectGetMinY(keyboardFrame);
+    CGFloat heightFromBottom = CGRectGetHeight(self.view.frame) - CGRectGetMinY(keyboardFrame);
 
     heightFromBottom = MAX(0.0, heightFromBottom);
-    
-//    if (@available(iOS 11, *)) {
-//        heightFromBottom = MAX(self.view.safeAreaInsets.bottom, heightFromBottom);
-//    }
 
     [self jsq_setToolbarBottomLayoutGuideConstant:heightFromBottom];
 }
