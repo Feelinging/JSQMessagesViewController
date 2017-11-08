@@ -301,12 +301,6 @@ JSQMessagesKeyboardControllerDelegate>
     if ([UIDevice jsq_isCurrentDeviceBeforeiOS8]) {
         [self.snapshotView removeFromSuperview];
     }
-    
-    if (@available(iOS 11.0, *)) {
-        if (!self.inputToolbar.contentView.textView.isFirstResponder) {
-            self.toolbarBottomLayoutGuide.constant = self.view.safeAreaInsets.bottom;
-        }
-    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -918,9 +912,9 @@ JSQMessagesKeyboardControllerDelegate>
 
     heightFromBottom = MAX(0.0, heightFromBottom);
     
-    if (@available(iOS 11, *)) {
-        heightFromBottom = MAX(self.view.safeAreaInsets.bottom, heightFromBottom);
-    }
+//    if (@available(iOS 11, *)) {
+//        heightFromBottom = MAX(self.view.safeAreaInsets.bottom, heightFromBottom);
+//    }
 
     [self jsq_setToolbarBottomLayoutGuideConstant:heightFromBottom];
 }
